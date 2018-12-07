@@ -1,0 +1,331 @@
+/**
+ *
+ * Apply Here your Custom CSS
+ *
+*/
+
+.mylabel2 {
+    margin-bottom: 0;
+    margin-top: 5px;
+    font-size: 1.8em;
+}
+
+#perc_up_css {
+    font-size: 40px;
+    font-weight: bold;
+    color: green;
+}
+
+.metric {
+    font-size: 1.5em;
+    line-height: 1;
+    font-weight: bold;
+}
+.chartwrapper {
+    width: 70%;
+    position: relative;
+    padding-bottom: 50%;
+    box-sizing: border-box;
+}
+
+.chartdiv {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.metric-small {
+    line-height: 1;
+    text-align: center;
+    color: seagreen;
+    font-weight: bold;
+}
+
+.metric-smaller {
+    line-height: 1;
+    color: black;
+}
+
+.metric-smallest {
+    line-height: 1;
+}
+
+.metric-bold {
+    line-height: 1;
+    font-weight: bold;
+}
+
+.metric-bolder {
+    line-height: 1;
+    font-weight: bold;
+    color: #007F02;
+}
+
+.metric-boldest {
+    line-height: 1;
+    font-weight: bold;
+}
+
+.umb_logo {
+    text-align: right !important;
+    font-size: 20px;
+    font-weight: bold;
+    color: #fc0;
+    margin-bottom: 0px;
+    margin-right: 130px;
+}
+
+.footer {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    padding: 1rem;
+    /*background-color: #efefef;*/
+    text-align: left;
+}
+
+
+
+@media (min-width: 768px) {
+    .col-md-12 .metric {
+        font-size: 1.59em;
+        line-height: 0.9;
+    }
+
+    .col-md-12 .metric-bold {
+        font-size: 2.9em;
+        line-height: 0.9;
+    }
+
+    .col-md-12 .metric-bolder {
+        font-size: 13.9em;
+        color: darkblue;
+    }
+
+    .col-md-12 .metric-small {
+        font-size: 5.2em;
+    }
+
+    .col-md-12 .metric-smaller {
+        font-size: 14px;
+    }
+
+    .col-sm-10 .metric-smallest {
+        font-size: 16px;
+    }
+    .col-sm-12 .metric-smallest {
+        font-size: 16px;
+    }
+}
+
+@media (min-width: 992px) {
+    .col-md-12 .metric {
+        font-size: 1.59em;
+    }
+
+    .col-md-12 .metric-bold {
+        font-size: 2.9em;
+        line-height: 0.9;
+    }
+
+    .col-md-12 .metric-bolder {
+        font-size: 13.9em;
+    }
+
+    .col-md-12 .metric-boldest {
+        font-size: 6.9em;
+        color: darkblue;
+    }
+
+    .col-md-12 .metric-small {
+        font-size: 5.2em;
+    }
+
+    .col-md-12 .metric-smaller {
+        font-size: 14px;
+    }
+
+    .col-sm-10 .metric-smallest {
+        font-size: 16px;
+    }
+    .col-sm-12 .metric-smallest {
+        font-size: 16px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .col-md-12 .metric {
+        font-size: 1.92em;
+    }
+
+    .col-md-12 .metric-bold {
+        font-size: 4.9em;
+        line-height: 0.9;
+    }
+
+    .col-md-12 .metric-boldest {
+        font-size: 6.9em;
+        color: darkblue;
+    }
+
+    .col-md-12 .metric-bolder {
+        font-size: 13.9em;
+    }
+
+    .col-md-12 .metric-small {
+        font-size: 5.45em;
+    }
+
+    .col-md-12 .metric-smaller {
+        font-size: 14px;
+    }
+
+    .col-sm-10 .metric-smallest {
+        font-size: 16px;
+    }
+    .col-sm-12 .metric-smallest {
+        font-size: 16px;
+    }
+}
+
+@media (min-width: 1400px) {
+    .col-md-12 .metric {
+        font-size: 2.24em;
+    }
+
+    .col-md-12 .metric-bolder {
+        font-size: 13.9em;
+    }
+
+    .col-md-12 .metric-boldest {
+        font-size: 6.9em;
+        color: darkblue;
+    }
+
+    .col-md-12 .metric-bold {
+        font-size: 4.59em;
+        line-height: 0.9;
+    }
+
+    .col-md-12 .metric-small {
+        font-size: 5.032em;
+    }
+
+    .col-md-12 .metric-smaller {
+        font-size: 18px;
+    }
+
+    .col-sm-10 .metric-smallest {
+        font-size: 25px;
+    }
+    .col-sm-12 .metric-smallest {
+        font-size: 25px;
+    }
+}
+
+@media (min-width: 1600px) {
+    .col-md-12 .metric {
+        font-size: 2.8em;
+    }
+
+    .col-md-12 .metric-bolder {
+        font-size: 13.9em;
+    }
+
+    .col-md-12 .metric-boldest {
+        font-size: 6.9em;
+        color: darkblue;
+    }
+
+    .col-md-12 .metric-bold {
+        font-size: 5.59em;
+        line-height: 0.9;
+    }
+
+    .col-md-12 .metric-small {
+        font-size: 6.04em;
+    }
+
+    .col-md-12 .metric-smaller {
+        font-size: 18px;
+    }
+
+    .col-sm-10 .metric-smallest {
+        font-size: 25px;
+    }
+    .col-sm-12 .metric-smallest {
+        font-size: 25px;
+    }
+}
+
+@media (min-width: 1800px) {
+    .col-md-12 .metric {
+        font-size: 3.0em;
+    }
+
+    .col-md-12 .metric-bold {
+        font-size: 5.59em;
+        line-height: 0.9;
+    }
+
+    .col-md-12 .metric-small {
+        font-size: 6.4em;
+    }
+
+    .col-md-12 .metric-bolder {
+        font-size: 13.9em;
+        color: #007F02;
+    }
+
+    .col-md-12 .metric-boldest {
+        font-size: 6.9em;
+        color: darkblue;
+    }
+
+    .col-md-12 .metric-smaller {
+        font-size: 18px;
+    }
+
+    .col-sm-10 .metric-smallest {
+        font-size: 25px;
+    }
+    .col-sm-12 .metric-smallest {
+        font-size: 25px;
+    }
+}
+
+@media (min-width: 2000px) {
+    .col-md-12 .metric {
+        font-size: 3.6em;
+    }
+
+    .col-md-12 .metric-boldest {
+        font-size: 6.9em;
+        color: darkblue;
+    }
+
+    .col-md-12 .metric-bold {
+        font-size: 6.59em;
+        line-height: 0.9;
+    }
+
+    .col-md-12 .metric-small {
+        font-size: 6.48em;
+    }
+
+    .col-md-12 .metric-bolder {
+        font-size: 13.9em;
+    }
+
+    .col-md-12 .metric-smaller {
+        font-size: 22px;
+    }
+
+    .col-sm-10 .metric-smallest {
+        font-size: 25px;
+    }
+    .col-sm-12 .metric-smallest {
+        font-size: 25px;
+    }
+}

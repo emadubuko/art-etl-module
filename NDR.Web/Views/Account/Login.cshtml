@@ -1,0 +1,153 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Neon Admin Panel" />
+    <meta name="author" content="" />
+    <link rel="icon" href="~/images/favicon.ico">
+    <title>NDR</title>
+    <link rel="stylesheet" href="~/js/jquery-ui/css/no-theme/jquery-ui-1.10.3.custom.min.css">
+    <link rel="stylesheet" href="~/css/entypo/css/entypo.css">
+    @*<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Noto+Sans:400,700,400italic">*@
+    <link href="~/app-assets/css/bootstrap.css" rel="stylesheet" />
+    @*<link rel="stylesheet" href="~/css/bootstrap.css">*@
+    <link rel="stylesheet" href="~/css/neon-core.css">
+    <link rel="stylesheet" href="~/css/neon-theme.css">
+    <link rel="stylesheet" href="~/css/neon-forms.css">
+    <link rel="stylesheet" href="~/css/custom.css">
+    <script src="~/js/jquery-1.11.3.min.js"></script>
+    <!--[if lt IE 9]><script src="~/js/ie8-responsive-file-warning.js"></script><![endif]-->
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+        <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <style>
+        /*.login-page .login-form .form-group .input-group {
+            background: #00a651;
+            border: 1px solid darkorange;
+        }*/
+        .login-page .login-form .form-group .input-group {
+            background: #fff;
+            border: 1px solid green;
+        }
+
+            .login-page .login-form .form-group .input-group .form-control {
+                color: #000;
+            }
+
+
+        .login-page {
+            background: #fff;
+        }
+
+        .foot-align {
+            padding-left: 40%;
+            padding-top: 14px;
+            color: #000;
+            font-size: 13px;
+        }
+        .input-group-addon{
+            padding:10px;
+        }
+    </style>
+
+</head>
+<body class="page-body login-page login-form-fall boxed-layout">
+
+    <div class="login-container">
+
+        <div class="login-header login-caret" style="padding:0px; background: #00a651;color: #fff;">
+            <div class="login-content" style="width:100%">
+                <a class="logo">
+                    <img src="~/images/fgn_logo.png" width="100" />
+                 </a>
+                <h2 style="color:#fff">National Data Repository</h2>
+            </div>
+
+        </div>
+
+        <div class="login-progressbar">
+            <div></div>
+        </div>
+
+        <div class="login-form" style="background: #f7f6f3;">
+
+            <div class="login-content">
+
+                <div class="form-login-error">
+                    <h3>Invalid login</h3>
+                </div>
+                
+                <form asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post">
+                    @Html.AntiForgeryToken()
+
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                    <p class="description" style="color:#000">Welcome, Please sign in</p>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">
+                                <i class="entypo-user"></i>
+                            </div>
+                            <input type="text" class="form-control" name="username" id="UserName" placeholder="enter your username here" autocomplete="off" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">
+                                <i class="entypo-key"></i>
+                            </div>
+                            <input type="password" class="form-control" name="Password" id="Password" placeholder="enter your password" autocomplete="off" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-sm btn-primary">
+                            <i class="entypo-login"></i>
+                            Login In
+                        </button>
+                    </div>
+                </form>
+                
+                <div class="login-bottom-links" style="padding:0px;">
+                    <a href="extra-forgot-password.html" class="link" style="color:red;">Forgot your password?</a>
+                    <br />
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="foot-align">
+            <footer class="footer-main">
+                &copy; @DateTime.Now.Year  <span>Federal Ministry of Health</span>
+            </footer>
+        </div>
+    </div>
+    <!-- Bottom scripts (common) -->
+    <script src="~/js/gsap/TweenMax.min.js"></script>
+    <script src="~/js/jquery-ui/js/jquery-ui-1.10.3.minimal.min.js"></script>
+    <script src="~/js/bootstrap.js"></script>
+    <script src="~/js/joinable.js"></script>
+    <script src="~/js/resizeable.js"></script>
+    <script src="~/js/neon-api.js"></script>
+    <script src="~/js/jquery.validate.min.js"></script>
+    <script src="~/js/neon-login.js"></script>
+
+    <!-- JavaScripts initializations and stuff -->
+    <script src="~/js/neon-custom.js"></script>
+
+</body>
+</html>
