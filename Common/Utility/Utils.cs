@@ -1,8 +1,11 @@
-﻿using Newtonsoft.Json.Serialization;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json.Serialization;
 using NHibernate.Persister.Entity;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Reflection;
@@ -17,6 +20,18 @@ namespace Common.Utility
 {
     public class Utils
     {
+        public static string GetAppConfigItem(string itemKey)
+        {
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+            var configuration = builder.Build();
+            if (configuration.GetSection(itemKey) != null)
+            {
+                return configuration.GetSection(itemKey).Value;
+            }
+            return null;
+        }
 
         public static string PasCaseConversion(string PascalWord)
         {
@@ -189,6 +204,43 @@ namespace Common.Utility
         }
 
 
+
+        public async Task<string> PostDateRemotelyWithStringResult(string url, string jsondata)
+        {
+            using (var client = new HttpClient())
+            {
+                var remote_address = new Uri(url);
+                try
+                {
+                    StringContent dataString = new StringContent(jsondata, Encoding.UTF8, "application/json");
+
+                    var result = await client.PostAsync(remote_address, dataString);
+                    if (result.StatusCode != System.Net.HttpStatusCode.OK)
+                    {
+                        string stringResult = result.Content.ReadAsStringAsync().Result;
+                        if (result.Content != null && !string.IsNullOrEmpty(stringResult))
+                        {
+                            Logger.LogInfo(url, stringResult);
+                            Console.WriteLine(stringResult);
+                        }
+                        return null;
+                    }
+                    else
+                    {
+                          return await result.Content.ReadAsStringAsync();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    string err = Logger.LogError(ex);
+                    Console.WriteLine(err);
+                }
+                return null;
+            }
+        }
+
+
+
         public async Task<bool> PostDateRemotelyAsync(string url, string jsondata)
         {
 
@@ -219,6 +271,54 @@ namespace Common.Utility
                 return true;
             }
         }
+
+
+        public async Task<bool> PostFileRemotely(string url, IFormFile file,int userid)
+        {
+            using (var client = new HttpClient())
+            {
+                var remote_address = new Uri(url);
+
+                try
+                {                     
+                    byte[] data;
+                    using (var br = new BinaryReader(file.OpenReadStream()))
+                        data = br.ReadBytes((int)file.OpenReadStream().Length);
+
+                    ByteArrayContent bytes = new ByteArrayContent(data);
+                    MultipartFormDataContent multiContent = new MultipartFormDataContent
+                    {
+                        { bytes, "file", file.FileName }
+                    };
+                    multiContent.Add(new StringContent(userid.ToString()), "userId");
+                    //if(obj != null)
+                    //{
+                    //    var data_dict = obj.AsDictionary();
+                    //    HttpContent dictionaryItems = new FormUrlEncodedContent(data_dict);
+                    //    multiContent.Add(dictionaryItems, "uploadedBy");
+                    //}                    
+
+                    var result = await client.PostAsync(remote_address, multiContent);
+                    if (result.StatusCode != System.Net.HttpStatusCode.OK)
+                    {
+                        string stringResult = result.Content.ReadAsStringAsync().Result;
+                        if (result.Content != null && !string.IsNullOrEmpty(stringResult))
+                        {
+                            Logger.LogInfo(url, stringResult);
+                            Console.WriteLine(stringResult);
+                        }
+                        return false;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogError(ex);
+                    return false;
+                }
+            }
+            return true;
+        }
+
     }
 
     public class NHibernateContractResolver : DefaultContractResolver
@@ -231,19 +331,5 @@ namespace Common.Utility
                 return base.CreateContract(objectType);
         }
     }
-
-    public static class Extension
-    {
-        public static IEnumerable<TSource> DistinctBy<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector)
-        {
-            HashSet<TKey> seenKeys = new HashSet<TKey>();
-            foreach (TSource element in source)
-            {
-                if (seenKeys.Add(keySelector(element)))
-                {
-                    yield return element;
-                }
-            }
-        }
-    }
+     
 }

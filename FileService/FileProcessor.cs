@@ -168,11 +168,11 @@ namespace FileService
                                  {
                                      DateUploaded = batch.DateUploaded,
                                      FileName = filename,
-                                     ParentFileName = batch.UploadedFileName,
+                                     //ParentFileName = batch.UploadedFileName,
                                      Status = FileProcessingStatus.Pending,
-                                     UploadedBy = batch.UploadedById,
+                                     UploadedBy = batch.UploadedBy.Id,
                                      BatchNumber = batch.BatchNumber,
-                                     FileBatchId = batch.Id
+                                     FileBatch = batch
                                  });
                         }
                     }

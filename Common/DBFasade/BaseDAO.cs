@@ -347,34 +347,11 @@ namespace Common.DBFasade
             return i;
         }
 
-        public long RunScalarSQL(string commandText)
+        public async Task<long> RunScalarSQLAsync(string sql)
         {
-            long i = 0;
-            if (!string.IsNullOrEmpty(commandText))
-            {
-                IDbConnection cn = ((ISessionFactoryImplementor)BuildSession().SessionFactory).ConnectionProvider.GetConnection();
-                IDbCommand cmd = new SqlCommand(commandText);
-                cmd.Connection = (SqlConnection)cn;
-                if (cn.State != ConnectionState.Open)
-                    cn.Open();
-
-                try
-                {
-                    cmd.CommandTimeout = 60 * 60;
-                    var obj = cmd.ExecuteScalar();
-                    long.TryParse(Convert.ToString(obj), out i);
-                }
-                catch (Exception ex)
-                {
-                    throw ex;
-                }
-                finally
-                {
-                    cn.Close();
-                    cn.Dispose();
-                    cmd.Dispose();
-                }
-            }
+            IDbConnection connection = ((ISessionFactoryImplementor)BuildSession().SessionFactory).ConnectionProvider.GetConnection();
+            var handler = new DatabaseHelper(connection);
+            int i = await handler.ExecuteStoredProcedure_ScalarAsync(sql, null);
             return i;
         }
 

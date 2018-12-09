@@ -3,181 +3,66 @@
     ViewBag.Title = "Index";
 }
 @section AddToHead{
-    <link rel="stylesheet" type="text/css" href="~/app-assets/vendors/css/file-uploaders/blueimp-gallery.min.css">
-    <link rel="stylesheet" type="text/css" href="~/app-assets/vendors/css/file-uploaders/jquery.fileupload.css">
-    <link rel="stylesheet" type="text/css" href="~/app-assets/vendors/css/file-uploaders/jquery.fileupload-ui.css">
+    <link rel="stylesheet" type="text/css" href="../../../app-assets/vendors/css/file-uploaders/dropzone.min.css">
+    <link rel="stylesheet" type="text/css" href="~/app-assets/css/plugins/file-uploaders/dropzone.css">
     <style>
         .btn.btn-warning.cancel {
             display: none
         }
+
+        .dropzone {
+            min-height: 350px;
+            border: 2px dashed #fff;
+            background: #F3F3F3;
+        }
+            .dropzone .dz-message {
+                color: #00a651;
+            }
+                .dropzone .dz-message:before {
+                    color: #00a651;
+                }
     </style>
 }
 
 <section id="dropzone-examples">
     <div class="row">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header">
-                    <h4 class="card-title">Interactive File Upload </h4>
+        <div class="offset-1 col-sm-10">
+
+            <div class="card box-shadow-0 border-success">
+                <div class="card-header card-head-inverse bg-success">
+                    <h4 class="card-title text-center text-white">NDR file upload page</h4>
                 </div>
                 <div class="card-content">
                     <div class="card-body">
-                        <!-- The file upload form used as target for the file upload widget -->
-                        <form id="fileupload" action="@Url.Action("UploadFile","File")"
-                              method="POST" enctype="multipart/form-data">
 
-
-                            <!-- The fileupload-buttonbar contains buttons to add/delete files and start/cancel the upload -->
-                            <div class="row fileupload-buttonbar">
-                                <div class="col-lg-7">
-                                    <!-- The fileinput-button span is used to style the file input field as button -->
-                                    <span class="btn btn-success fileinput-button mr-1">
-                                        <i class="icon-plus"></i>
-                                        <span>Add files...</span>
-                                        <input type="file" name="files[]" multiple>
-                                    </span> 
-                                    <span class="fileupload-process"></span>
-                                </div>
-                                <!-- The global progress state -->
-                                <div class="col-lg-5 fileupload-progress fade">
-                                     <progress class="progress progress-striped progress-success" value="0" max="100"></progress>
-                                     <div class="progress-extended">&nbsp;</div>
-                                </div>
-                            </div>
-                            <!-- The table listing the files available for upload/download -->
-                            <table role="presentation" class="table table-striped">
-                                <tbody class="files"></tbody>
-                            </table>
+                        <form action="/Fileupload/UploadFile" class="dropzone dropzone-area dz-clickable" id="dpz-file-limits">
+                            <div class="dz-message">Drop Files Here To Upload</div>
                         </form>
+
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
 </section>
-<div id="blueimp-gallery" class="blueimp-gallery blueimp-gallery-controls" data-filter=":even">
-    <div class="slides"></div>
-    <span class="title font-medium-3"></span>
-    <a class="prev">‹</a>
-    <a class="next">›</a>
-    <a class="close">×</a>
-    <a class="play-pause"></a>
-    <ol class="indicator"></ol>
-</div>
+
+
+
 
 @section Scripts{
-
-    <script src="~/app-assets/vendors/js/extensions/jquery-file-upload/vendor/jquery.ui.widget.js"
-            type="text/javascript"></script>
-    <script src="~/app-assets/vendors/js/extensions/jquery-file-upload/vendor/tmpl.min.js"
-            type="text/javascript"></script>
-    <script src="~/app-assets/vendors/js/extensions/jquery-file-upload/vendor/load-image.all.min.js"
-            type="text/javascript"></script>
-    <script src="~/app-assets/vendors/js/extensions/jquery-file-upload/vendor/canvas-to-blob.min.js"
-            type="text/javascript"></script>
-    <script src="~/app-assets/vendors/js/extensions/jquery-file-upload/vendor/jquery.blueimp-gallery.min.js"
-            type="text/javascript"></script>
-    <script src="~/app-assets/vendors/js/extensions/jquery-file-upload/jquery.iframe-transport.js"
-            type="text/javascript"></script>
-    <script src="~/app-assets/vendors/js/extensions/jquery-file-upload/jquery.fileupload.js"
-            type="text/javascript"></script>
-    <script src="~/app-assets/vendors/js/extensions/jquery-file-upload/jquery.fileupload-process.js"
-            type="text/javascript"></script>
-    <script src="~/app-assets/vendors/js/extensions/jquery-file-upload/jquery.fileupload-image.js"
-            type="text/javascript"></script>
-    <script src="~/app-assets/vendors/js/extensions/jquery-file-upload/jquery.fileupload-audio.js"
-            type="text/javascript"></script>
-    <script src="~/app-assets/vendors/js/extensions/jquery-file-upload/jquery.fileupload-video.js"
-            type="text/javascript"></script>
-    <script src="~/app-assets/vendors/js/extensions/jquery-file-upload/jquery.fileupload-validate.js"
-            type="text/javascript"></script>
-    <script src="~/app-assets/vendors/js/extensions/jquery-file-upload/jquery.fileupload-ui.js"
-            type="text/javascript"></script>
-    <script src="~/app-assets/js/scripts/extensions/jquery-file-upload.js" type="text/javascript"></script>
-
-    <script id="template-upload" type="text/x-tmpl">
-        {% for (var i=0, file; file=o.files[i]; i++) { %}
-        <tr class="template-upload">
-            <td>
-                <span class="preview"></span>
-            </td>
-            <td>
-                <p class="name">{%=file.name%}</p>
-                <strong class="error text-danger"></strong>
-            </td>
-            <td>
-                <p class="size">Processing...</p>
-                <progress class="progress progress-striped progress-success" value="0" max="100"></progress>
-            </td>
-            <td>
-                {% if (!i && !o.options.autoUpload) { %}
-                <button class="btn btn-primary start" disabled>
-                    <i class="icon-cloud-upload"></i>
-                    <span>Start</span>
-                </button>
-                {% } %} {% if (!i) { %}
-                <button class="btn btn-warning cancel">
-                    <i class="icon-ban"></i>
-                    <span>Cancel</span>
-                </button>
-                {% } %}
-            </td>
-        </tr>
-        {% } %}
-    </script>
-    <!-- The template to display files available for download -->
-    <script id="template-download" type="text/x-tmpl">
-        {% for (var i=0, file; file=o.files[i]; i++) { %}
-        <tr class="template-download">
-            <td>
-                <span class="preview">
-                    {% if (file.thumbnailUrl) { %}
-                    <a href="{%=file.url%}" title="{%=file.name%}" download="{%=file.name%}" data-gallery>
-                        <img src="{%=file.thumbnailUrl%}">
-                    </a>
-                    {% } %}
-                </span>
-            </td>
-            <td>
-                <p class="name">
-                    {% if (file.url) { %}
-                    <a href="{%=file.url%}" title="{%=file.name%}" download="{%=file.name%}" {%=file.thumbnailUrl?
-                       'data-gallery' : '' %}>{%=file.name%}</a> {% } else { %}
-                    <span>{%=file.name%}</span>
-                    {% } %}
-                </p>
-                {% if (file.message) { %}
-                <div>
-                    <span class="tag tag-default" style="color:red">{%=file.message%}</span>
-                </div>
-
-                {% } %}
-            </td>
-            <td>
-                <span class="size">{%=o.formatFileSize(file.size)%}</span>
-            </td>
-            <td>
-                {% if (file.deleteUrl) { %}
-                <button class="btn btn-danger delete" data-type="{%=file.deleteType%}" data-url="{%=file.deleteUrl%}"
-                        {% if (file.deleteWithCredentials) { %} data-xhr-fields='{"withCredentials":true}'
-                        {% } %}>
-                    <i class="icon-trash"></i>
-                    <span>Delete</span>
-                </button>
-                <input type="checkbox" name="delete" value="1" class="toggle"> {% } else { %}
-                <button class="btn btn-warning cancel">
-                    <i class="icon-ban"></i>
-                    <span>Cancel</span>
-                </button>
-                {% } %}
-            </td>
-        </tr>
-        {% } %}
-    </script>
+    <script src="~/app-assets/vendors/js/extensions/dropzone.min.js" type="text/javascript"></script>
 
     <script>
         $(document).ready(function () {
-
+            Dropzone.options.dpzFileLimits = {
+                paramName: "file", // The name that will be used to transfer the file
+                maxFilesize: 0.5, // MB
+                maxFiles: 5,
+                maxThumbnailFilesize: 1, // MB
+                acceptedFiles: 'zip/*',
+                clickable: true
+            }
         });
     </script>
 }

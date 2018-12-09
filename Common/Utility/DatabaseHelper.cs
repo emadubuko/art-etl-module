@@ -24,6 +24,18 @@ namespace Common.Utility
             return result;
         }
 
+        public IList<TOut> ExecuteSQLScriptAsync<TOut>(string procedureName, object parameters=null)
+        {
+            IList<TOut> result = null;
+
+            if (connection.State != ConnectionState.Open)
+                connection.Open();
+
+            result = connection.Query<TOut>(procedureName,
+                            parameters, commandType: CommandType.Text) as List<TOut>;
+            return result;
+        }
+
         public TOut ExecuteStoredProcedure_OneResultSet<TOut>(string procedureName, object parameters)
         {
             TOut result = default(TOut);

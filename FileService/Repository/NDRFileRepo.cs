@@ -2,6 +2,7 @@
 using Common.Utility;
 using FileService.Model;
 using NHibernate;
+using NHibernate.Criterion;
 using NHibernate.Engine;
 using System;
 using System.Collections.Generic;
@@ -27,15 +28,15 @@ namespace FileService.Entities
 
         public async Task UpdateFileStatusAsync(FileUpdateModel model)
         {
-            if(model.Status != FileProcessingStatus.Processed && model.Status != FileProcessingStatus.Failed)
+            if (model.Status != FileProcessingStatus.Processed && model.Status != FileProcessingStatus.Failed)
             {
                 throw new ApplicationException("transaction status not supported");
             }
             string sql = string.Format("Update ndrfile set Status= '{0}' where Id in ({1})", model.Status.ToString(), string.Join(",", model.Ids));
 
-            
+
             if (!string.IsNullOrEmpty(sql))
-               await handler.ExecuteStoredProcedure_NoResultAsync(sql, null);
+                await handler.ExecuteStoredProcedure_NoResultAsync(sql, null);
         }
 
         public async Task<bool> MarkBatchAsCompletedAsync(string batchNumber)
@@ -55,6 +56,7 @@ namespace FileService.Entities
             return true;
         }
 
+        /*
         public List<NDRFile> GetUnprocessedFilesInBatch()
         {
             var cmd = new SqlCommand();
@@ -81,6 +83,7 @@ namespace FileService.Entities
             }
             return files;
         }
+       
 
 
         public DataTable GetUploadReport(string organization = "")
@@ -91,6 +94,41 @@ namespace FileService.Entities
             cmd.Parameters.AddWithValue("@organization", organization);
             cmd.CommandTimeout = 80;
             return RetrieveAsDataTable(cmd);
+        }
+        */
+
+        public List<FileUploadViewModel> RetrieveUsingPagingAsync(ZipFileSearchModel search, out int totalCount)
+        {
+             IStatelessSession session = BuildSession().SessionFactory.OpenStatelessSession();
+            var result = (from item in session.Query<FileZipUpload>().Skip(search.StartIndex ).Take(search.MaxRows ?? 20)
+                          select new FileUploadViewModel
+                          {
+                              Id = item.Id,
+                              DT_RowId = item.Id,
+                              BatchNumber = item.BatchNumber,
+                              DateUploaded = item.DateUploaded,
+                              FileName = item.UploadedFileName,
+                              Status = item.Status.ToString(), 
+                              UploadedBy = item.UploadedBy.FullName,
+                              IP = item.UploadedBy.IP.ShortName,
+                          }).ToList();
+
+
+            foreach (var item in result)
+            {
+                string sql = string.Format("SELECT status, count(*) FROM  ndrfile where filebatchid = {0} group by status", item.Id);
+                IList<TempFileStatus> statusList = handler.ExecuteSQLScriptAsync<TempFileStatus>(sql);
+                if(statusList != null)
+                {
+                    item.TotalFile = statusList.Sum(x => x.Count);
+                    item.TotalFileProcessed = statusList.Where(x => x.Status == "Processed").Sum(x => x.Count);
+                   // item.TotalFacilities = item.TotalFileProcessed;
+                }                 
+            }
+
+            totalCount = session.Query<FileZipUpload>().Count();
+
+            return result;
         }
 
 
@@ -151,5 +189,11 @@ namespace FileService.Entities
 
 
 
+    }
+
+    public class TempFileStatus
+    {
+        public string Status { get; set; }
+        public Int64 Count { get; set; }
     }
 }

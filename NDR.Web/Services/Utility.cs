@@ -1,7 +1,9 @@
 ﻿using Common.CommonEntities;
 using Common.CommonRepo;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -9,6 +11,9 @@ namespace NDR.Web.Services
 {
     public class Utility
     {
+
+        
+
         public static string DisplayBadge
         {
             get

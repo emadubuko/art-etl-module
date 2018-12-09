@@ -11,6 +11,44 @@ namespace Common.Utility
 {
     public static class MyExtension
     {
+        public static T ToObject<T>(this IDictionary<string, object> source)
+        where T : class, new()
+        {
+            var someObject = new T();
+            var someObjectType = someObject.GetType();
+
+            foreach (var item in source)
+            {
+                someObjectType
+                         .GetProperty(item.Key)
+                         .SetValue(someObject, item.Value, null);
+            }
+
+            return someObject;
+        }
+
+        public static Dictionary<string, string> AsDictionary(this object source, BindingFlags bindingAttr = BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Instance)
+        {
+            return source.GetType().GetProperties(bindingAttr).ToDictionary
+            (
+                propInfo => propInfo.Name,
+                propInfo => Convert.ToString(propInfo.GetValue(source, null))
+            );
+
+        }
+
+        public static IEnumerable<TSource> DistinctBy<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector)
+        {
+            HashSet<TKey> seenKeys = new HashSet<TKey>();
+            foreach (TSource element in source)
+            {
+                if (seenKeys.Add(keySelector(element)))
+                {
+                    yield return element;
+                }
+            }
+        }
+
         public static void CopyPropertiesTo<T, U>(this T source, U dest)
         {
             if (source == null)
