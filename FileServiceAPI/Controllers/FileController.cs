@@ -35,12 +35,15 @@ namespace FileServiceAPI.Controllers
             try
             {
                 await fileRepo.UpdateFileStatusAsync(model);
-                return Ok("Success!");
+                 
             }
             catch (Exception ex)
             {
                 return BadRequest(ex);
             }
+
+            fileRepo.CloseSession();
+            return Ok("Success!");
         }
 
         [HttpPost]
@@ -54,19 +57,23 @@ namespace FileServiceAPI.Controllers
                 }
 
                 errorLog.SaveValidationResult(validationSummary as List<ValidationSummary>);
-                return Ok("Success!");
+                if (validationSummary.Any())
+                    fileRepo.MarkBatchAsCompletedAsync(validationSummary.FirstOrDefault().FileUploadBacthNumber).Wait();
+                 
             }
             catch (Exception ex)
             {
                 return BadRequest(ex);
             }
+
+            fileRepo.CloseSession();
+            return Ok("Success!");
         }
 
         public async Task<string> GenerateReport(string queryString) // (int userId)
         {
             UserProfile currentuser = await new UserRepo().RetrieveAsync(1);
-            var FileRepo = new NDRFileRepo();
-
+ 
             string[] param = queryString.Split('|');
             ZipFileSearchModel searchModel = new ZipFileSearchModel
             {
@@ -75,13 +82,15 @@ namespace FileServiceAPI.Controllers
                 MaxRows = Convert.ToInt32(param[2])
             };
 
-            List<FileUploadViewModel> mydata = FileRepo.RetrieveUsingPagingAsync(searchModel, out int total);
+            List<FileUploadViewModel> mydata = fileRepo.RetrieveUsingPagingAsync(searchModel, out int total);
 
             foreach (var dr in mydata)
             {
                 dr.ViewErrorbutton = string.Format("<a style='text-transform: capitalize;' class='btn btn-sm {2} viewvalidationsummary' id='{0}' {1}>View Validation Summary</a>&nbsp;&nbsp;&nbsp; <i style='display:none' id='loadImg2'><img class='center' src='/images/spinner.gif' width='40'> please wait ...</i>", dr.Id, dr.Status == "Pending" ? "disabled" : "", dr.Status == "Pending" ? "btn-default" : "btn-info");
             }
 
+            fileRepo.CloseSession();
+ 
             //return mydata;
             return JsonConvert.SerializeObject(
                         new
@@ -108,9 +117,7 @@ namespace FileServiceAPI.Controllers
             {
                 Directory.CreateDirectory(directory);
             }
-
-            // UserProfile uploadedBy = MembershipProvider.FormsAuthenticationService.LoggedinProfile;
-
+            
             if (Request.Form.Files.Count == 0 || string.IsNullOrEmpty(Request.Form.Files[0].FileName))
             {
                 return StatusCode((int)HttpStatusCode.InternalServerError, "No file uploaded");
@@ -123,6 +130,11 @@ namespace FileServiceAPI.Controllers
                     if (ndrfile.Length > 0 && Path.GetExtension(ndrfile.FileName).Substring(1).ToUpper() == "ZIP")
                     {
                         string filePath = directory + DateTime.Now.ToString("dd hh_mm_ss") + "_" + ndrfile.FileName;
+
+                        using (var inputStream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await ndrfile.CopyToAsync(inputStream); 
+                        }
 
                         long lastId = await fileRepo.RunScalarSQLAsync("SELECT MAX(Id) FROM filezipupload");
                         string batchNumber = string.Format("{0}_{1:MMM_yyyy}_{2}", uploadedBy.IP.ShortName, DateTime.Now, lastId < 1 ? 1 : lastId + 1);
@@ -151,6 +163,8 @@ namespace FileServiceAPI.Controllers
                         return BadRequest("wrong file type uploaded. Please upload zip files only");
                 }
             }
+
+            fileRepo.CloseSession();
             return Ok("success");
         }
 

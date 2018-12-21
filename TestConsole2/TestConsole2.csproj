@@ -8,6 +8,7 @@
   <ItemGroup>
     <ProjectReference Include="..\ART.DAL\ART.DAL.csproj" />
     <ProjectReference Include="..\Common\Common.csproj" />
+    <ProjectReference Include="..\QueueSubscriber\QueueSubscriber.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -17,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Npgsql" Version="4.0.3" />
+    <PackageReference Include="Npgsql" Version="4.0.4" />
   </ItemGroup>
 
 </Project>

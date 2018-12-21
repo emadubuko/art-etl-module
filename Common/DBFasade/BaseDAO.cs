@@ -12,6 +12,7 @@ using NHibernate.Criterion;
 using NHibernate.Engine;
 using NHibernate.Persister.Entity;
 using NHibernate.Transform;
+using Npgsql;
 
 namespace Common.DBFasade
 {
@@ -256,6 +257,11 @@ namespace Common.DBFasade
         }
 
 
+        public void CloseSession()
+        {
+            NhibernateSessionManager.Instance.CloseSession();
+        }
+
         protected static ITransaction BuildTransaction(ISession session)
         {
             if (session.Transaction == null || !session.Transaction.IsActive)
@@ -411,7 +417,7 @@ namespace Common.DBFasade
                 using (IDbConnection conn = ((ISessionFactoryImplementor)sessionFactory).ConnectionProvider.GetConnection())
                 {
                     SqlDataAdapter da = new SqlDataAdapter();
-                    cmd.Connection = conn;
+                    cmd.Connection = conn as Npgsql.NpgsqlConnection;
                     da.SelectCommand = (SqlCommand)cmd;
 
                     if (conn.State != ConnectionState.Open)
@@ -429,6 +435,33 @@ namespace Common.DBFasade
             return ds;
         }
 
+        public DataTable RetrieveAsDataTable(string cmdText)
+        {
+            DataTable ds = new DataTable();
+            ISessionFactory sessionFactory = NhibernateSessionManager.Instance.GetSession().SessionFactory;
+            try
+            {
+                using (NpgsqlConnection conn = (NpgsqlConnection)((ISessionFactoryImplementor)sessionFactory).ConnectionProvider.GetConnection())
+                {
+
+                    NpgsqlCommand com = new NpgsqlCommand(cmdText, conn);
+                    NpgsqlDataAdapter da = new NpgsqlDataAdapter(com);
+                    //da.SelectCommand = cmdText;
+                    if (conn.State != ConnectionState.Open)
+                        conn.Open();
+
+                    da.Fill(ds);
+                    com.Dispose();
+                    da.Dispose();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return ds;
+        }
 
         public DataTable RetrieveAsDataTable(SqlCommand cmd, string connectionString)
         {

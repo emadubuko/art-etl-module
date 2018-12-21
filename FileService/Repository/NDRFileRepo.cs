@@ -44,13 +44,13 @@ namespace FileService.Entities
             //check if batch has completed
             string sql = "";
             long status = 0;
-            sql = string.Format("Select count(*) from (Select Status,BatchNumber, count(*) 'count' from FileUpload where BatchNumber = '{0}' and Status='Pending' group by BatchNumber,Status) as mydata", batchNumber);
+            sql = string.Format("Select count(*) from ndrfile where BatchNumber = '{0}' and Status in ('Pending','Processing') ", batchNumber);
             status = await handler.ExecuteStoredProcedure_ScalarAsync(sql, null);
 
             //return true if completed, false otherwise
             if (status == 0)
             {
-                sql = string.Format("Update FileBatch set Status = 'Completed' where BatchNumber = '{0}'", batchNumber);
+                sql = string.Format("Update filezipupload set Status = 'Completed' where BatchNumber = '{0}'", batchNumber);
                 await handler.ExecuteStoredProcedure_NoResultAsync(sql, null);
             }
             return true;

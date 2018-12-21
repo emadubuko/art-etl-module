@@ -21,12 +21,15 @@ namespace ART.DAL.Services
 {
     public class DocumentProcessor
     {
-         Dictionary<string, ImplementingPartners> IPs;
-         IEnumerable<IGrouping<ImplementingPartners, IPFacility>> IPFacilities;
+        Dictionary<string, ImplementingPartners> IPs;
+        IEnumerable<IGrouping<ImplementingPartners, IPFacility>> IPFacilities;
         Dictionary<string, Dictionary<string, OnboardedFacility>> facilities;
-               
+        ThirdPartyProcessor _3PartyProcessor;
+        readonly ContainerRepo containerRepo;
         public DocumentProcessor()
         {
+            containerRepo = new ContainerRepo();
+            _3PartyProcessor = new ThirdPartyProcessor();
             IPs = new IPRepo().RetrieveAllLazily().ToDictionary(x => x.ShortName);
             IPFacilities = new BaseDAO<IPFacility, int>().RetrieveAllLazily().GroupBy(x => x.IP);
             facilities = new Dictionary<string, Dictionary<string, OnboardedFacility>>();
@@ -36,13 +39,19 @@ namespace ART.DAL.Services
             }
         }
 
-        public bool ProcessDocument(string xmlContent)
+        public bool ProcessDocument(string input)
         {
-             string err = "";
+            string err = "";
             if (!string.IsNullOrEmpty(err))
             {
                 return false;
             }
+
+            string[] inputs = input.Split(new string[] { "@||@" }, StringSplitOptions.None);
+
+            Int32.TryParse(inputs[0], out int fileId);
+            string batchNumber = inputs[1];
+            string xmlContent = inputs[2];
 
             xmlContent = xmlContent.Replace(" & ", " &amp; ");
             xmlContent = xmlContent.Replace("'", "&apos;");
@@ -58,25 +67,47 @@ namespace ART.DAL.Services
             if (msg != null)
             {
                 var container = ExtractAndTransformMessage(msg);
+                container.BatchNumber = batchNumber;
+                container.FileId = fileId;
                 return SaveData(new List<dtoContainer> { container });
             }
             else
             {
+                _3PartyProcessor.UpdateFileStatusAsync(
+                       JsonConvert.SerializeObject(
+                           new
+                           {
+                               Ids = new List<int> { fileId },
+                               Status = "Failed"
+                           })
+                       );
+                List<dynamic> validationSummary = new List<dynamic>
+                {
+                    new
+                    {
+                        FacilityName = "Others",
+                        ErrorDetails = err,
+                        InvalidFiles = 1,
+                        Status = NotificationStatus.Logged,
+                        FileUploadBacthNumber = batchNumber,
+                    }
+                };
+                _3PartyProcessor.PublishValidationSummaryAsync(JsonConvert.SerializeObject(validationSummary));
+
+                containerRepo.CloseSession();
                 return false;
             }
         }
 
         private bool SaveData(List<dtoContainer> containers)
         {
-            ThirdPartyProcessor _3PartyProcessor = new ThirdPartyProcessor();
             try
             {
-                var containerRepo = new ContainerRepo();
-                var time = containerRepo.BulkSave(containers);
-
+                 var time = containerRepo.BulkSave(containers);
+ 
                 //update the file uploads entries
-                var fileIds = containers.Where(x => !x.CriticalError).Select(x => x.FileId);
-                if(fileIds != null && fileIds.Count() > 0)
+                var fileIds = containers.Where(x => !x.CriticalError).Select(x => x.FileId).ToList();
+                if (fileIds != null && fileIds.Count() > 0)
                 {
                     _3PartyProcessor.UpdateFileStatusAsync(
                                         JsonConvert.SerializeObject(
@@ -87,9 +118,9 @@ namespace ART.DAL.Services
                                             })
                                         );
                 }
-                
-                var failedFileId = containers.Where(x => x.CriticalError).Select(x => x.FileId);
-                if(failedFileId != null || failedFileId.Count() > 0)
+
+                var failedFileId = containers.Where(x => x.CriticalError).Select(x => x.FileId).ToList();
+                if (failedFileId != null && failedFileId.Count() > 0)
                 {
                     _3PartyProcessor.UpdateFileStatusAsync(
                        JsonConvert.SerializeObject(
@@ -109,7 +140,7 @@ namespace ART.DAL.Services
                 {
                     var patientGrouping = containers.Where(x => x.PatientDemographics != null && x.PatientDemographics.TreatmentFacility != null)
                         .GroupBy(x => x.PatientDemographics.TreatmentFacility);
-                                       
+
                     foreach (var grp in patientGrouping)
                     {
                         var summary = new
@@ -120,12 +151,12 @@ namespace ART.DAL.Services
                             InvalidFiles = grp.Count(x => x.Errors.Count != 0),
                             ErrorDetails = grp.ToList().SelectMany(x => x.Errors).ToList(),
                             FileUploadBacthNumber = grp.FirstOrDefault().BatchNumber,
-                        };                         
+                        };
                         validationSummary.Add(summary);
                     }
                 }
-                 
-                var othererrors = containers.Where(x => x.PatientDemographics == null 
+
+                var othererrors = containers.Where(x => x.PatientDemographics == null
                                     || x.PatientDemographics.TreatmentFacility == null)
                                     .SelectMany(x => x.Errors);
 
@@ -149,8 +180,8 @@ namespace ART.DAL.Services
                 return false;
             }
             return true;
-         }
-                
+        }
+
         public dtoContainer ExtractAndTransformMessage(Container msg)
         {
             dtoContainer cnt = new dtoContainer();

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace ART.DAL.ViewModels
+namespace Common.ViewModels
 {
     public class DocumentResultModel
     {

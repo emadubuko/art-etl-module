@@ -20,8 +20,8 @@ namespace Common.CommonRepo
     {
         public Dictionary<string, string> RetriveStateCoding()
         {
-            var cmd = new SqlCommand("select state_name, map_code from states");
-            return RetrieveAsDataTable(cmd)
+            //var cmd = new SqlCommand("select state_name, map_code from states");
+            return RetrieveAsDataTable("select state_name, map_code from admin_states")
                 .AsEnumerable()
                 .ToDictionary(row => row.Field<string>(0), row => row.Field<string>(1));
         }
@@ -39,14 +39,14 @@ namespace Common.CommonRepo
 
         public List<IPLGAFacility> GetDashBoardFilter(string IP)
         {
-            string sql = "select ip.ShortName 'IP', obf.FacilityName, obf.DatimFacilityCode, l.lga_code from IPFacility ipf, ImplementingPartners ip, OnboardedFacility obf, lga l where ipf.IP = ip.Id and ipf.FacilityId = obf.Id and obf.LGA = l.lga_code";
+            string sql = "select ip.ShortName as IP, obf.FacilityName, obf.DatimFacilityCode, l.lga_code from admin_IPFacility ipf, admin_ImplementingPartners ip, admin_OnboardedFacility obf, admin_lga l where ipf.IP = ip.Id and ipf.FacilityId = obf.Id and obf.LGA = l.lga_code";
             if (!string.IsNullOrEmpty(IP))
             {
                 sql = string.Format("{0} and ip.ShortName='{1}'", sql, IP);
             }
 
-            var cmd = new SqlCommand(sql);
-            var data = RetrieveAsDataTable(cmd);
+            //var cmd = new SqlCommand(sql);
+            var data = RetrieveAsDataTable(sql);
 
             List<IPLGAFacility> IPLocation = new List<IPLGAFacility>();
 

@@ -7,14 +7,11 @@ using NHibernate.Criterion;
 using NHibernate.Transform;
 using System.Linq;
 using System.Diagnostics;
-using NHibernate.Persister.Entity;
 using Common.DBFasade;
 using ART.DAL.Entities;
-using ART.DAL.ViewModels;
 using Common.Utility;
-using System.Data.SqlClient;
 using ART.DAL.Services;
-using NHibernate.SqlCommand;
+using Common.ViewModels;
 
 namespace ART.DAL.Repository
 {

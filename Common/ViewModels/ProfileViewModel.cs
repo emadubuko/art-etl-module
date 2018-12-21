@@ -1,12 +1,11 @@
-﻿using ART.DAL.Entities;
-using Common.CommonEntities;
+﻿using Common.CommonEntities;
 using Common.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Serialization;
 
-namespace ART.DAL.ViewModels
+namespace Common.ViewModels
 {
     public class ProfileViewModel : AutomaticViewModel<UserProfile>
     {

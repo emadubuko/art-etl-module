@@ -28,7 +28,7 @@ namespace NDR.Web.Controllers
         //this is for file upload
         public IActionResult Index()
         {
-            
+
 
             return View();
         }
@@ -42,7 +42,7 @@ namespace NDR.Web.Controllers
         public async Task<string> UploadReport(int? draw, int? start, int? length)
         {
             string fileUrl = Utils.GetAppConfigItem("fileQueryURL");
-            var search = string.Format("{0}|{1}|{2}|{3}", Request.Form["search[value]"], start, length,draw);
+            var search = string.Format("{0}|{1}|{2}|{3}", Request.Form["search[value]"], start, length, draw);
 
             fileUrl += "?queryString=" + search;
 
@@ -50,7 +50,7 @@ namespace NDR.Web.Controllers
             return responseString;
         }
 
-        
+
 
         [HttpPost]
         public async Task<IActionResult> UploadFile(string connectionId)
@@ -77,15 +77,14 @@ namespace NDR.Web.Controllers
                 {
                     if (ndrfile.Length > 0 && Path.GetExtension(ndrfile.FileName).Substring(1).ToUpper() == "ZIP")
                     {
-                        string filePath = "";
-                        filePath = directory + DateTime.Now.ToString("dd hh_mm_ss") + "_" + ndrfile.FileName;
+                        string filePath = directory + DateTime.Now.ToString("dd hh_mm_ss") + "_" + ndrfile.FileName;
 
                         using (var inputStream = new FileStream(filePath, FileMode.Create))
                         {
                             await ndrfile.CopyToAsync(inputStream);
-                            byte[] array = new byte[inputStream.Length];
-                            inputStream.Seek(0, SeekOrigin.Begin);
-                            inputStream.Read(array, 0, array.Length);
+                            //byte[] array = new byte[inputStream.Length];
+                            //inputStream.Seek(0, SeekOrigin.Begin);
+                            //inputStream.Read(array, 0, array.Length);
                         }
                         bool status = await utils.PostFileRemotely(fileUrl, ndrfile, uploadedBy.Id);
                         if (status == false)

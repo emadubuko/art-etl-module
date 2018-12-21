@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ART.DAL.ViewModels
+namespace Common.ViewModels
 {
     public class FileUploadViewModel
     {

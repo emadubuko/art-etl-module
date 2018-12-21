@@ -1,44 +1,54 @@
-﻿using ART.DAL.ViewModels;
-using Common.DBFasade;
+﻿using Common.DBFasade;
 using Common.Utility;
+using Common.ViewModels;
+using NHibernate;
+using NHibernate.Engine;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
 using System.Linq;
-using System.Threading.Tasks;
+using System.Text;
 
-namespace ART.DAL.Repository
+namespace Common.CommonRepo
 {
-
-    /*
     public class DashBoardRepo
     {
-        public List<MacroReport> GenerateMacroReportForDisplay(string IPShortName)
+        readonly ISessionFactory sessionFactory;
+        private DatabaseHelper handler;
+        readonly IDbConnection connection;
+        public DashBoardRepo()
         {
-            List<Models.MacroReport> report = new List<Models.MacroReport>();
+            sessionFactory = NhibernateSessionManager.Instance.GetSession().SessionFactory;
+            connection = ((ISessionFactoryImplementor)sessionFactory).ConnectionProvider.GetConnection();
+            handler = new DatabaseHelper(connection);
+        }
 
-            var cmd = new SqlCommand();
-            string sql = "select * from [dbo].[temp_DashBoardSummaryReport]";
+        public IList<MacroReport> GenerateMacroReportForDisplay(string IPShortName)
+        {
+            IList<MacroReport> report = new List<MacroReport>();
+
+             string sql = "select * from temp_DashBoardSummaryReport";
             if (!string.IsNullOrEmpty(IPShortName))
             {
-                sql += " where IP= @ip";
-                cmd.CommandText = sql;
-                var param = new SqlParameter("ip", SqlDbType.VarChar);
-                param.Value = IPShortName;
-                cmd.Parameters.Add(param);
-            }
-            else
-            {
-                cmd.CommandText = sql;
+                sql += string.Format(" where IP= '{0}'", IPShortName);
             }
 
+            try
+            {
+                report = handler.ExecuteSQLScriptAsync<MacroReport>(sql);
+            }
+            catch(Exception ex)
+            {
+                Logger.LogError(ex);
+            }
+            
+            return report;
+            /*
             var table = new Utils().RetrieveAsDataTable(cmd);
             cmd.Dispose();
-
             foreach (DataRow dr in table.Rows)
             {
-                var m = new Models.MacroReport
+                var m = new MacroReport
                 {
                     State = dr.Field<string>("State"),
                     LGA = dr.Field<string>("LGA"),
@@ -56,25 +66,21 @@ namespace ART.DAL.Repository
                 };
                 report.Add(m);
             }
+            
             return report;
+            */
         }
 
-        public List<TX_Curr_By_Month_Model> Get_TX_CURR_By_Month(string IPShortName)
+        public IList<TX_Curr_By_Month_Model> Get_TX_CURR_By_Month(string IPShortName)
         {
-            var cmd = new SqlCommand();
-            string sql = "select * from [dbo].[temp_TX_CURR_by_month]";
+             string sql = "select * from [dbo].[temp_TX_CURR_by_month]";
             if (!string.IsNullOrEmpty(IPShortName))
             {
-                sql += " where IP= @ip";
-                cmd.CommandText = sql;
-                var param = new SqlParameter("ip", SqlDbType.VarChar);
-                param.Value = IPShortName;
-                cmd.Parameters.Add(param);
+                sql += string.Format(" where IP= '{0}'", IPShortName);
             }
-            else
-            {
-                cmd.CommandText = sql;
-            }
+            var report = handler.ExecuteSQLScriptAsync<TX_Curr_By_Month_Model>(sql);
+            return report;
+            /*
             var table = new Utils().RetrieveAsDataTable(cmd);
             cmd.Dispose();
 
@@ -108,14 +114,16 @@ namespace ART.DAL.Repository
                 });
             }
             return model;
+            */
         }
 
-        public List<FacilityCompletenessModel> GetCompletenessReportFacility(string IPShortName)
+        public IList<FacilityCompletenessModel> GetCompletenessReportFacility(string IPShortName)
         {
-            var cmd = new SqlCommand();
-            cmd.CommandText = "Select * from [dbo].[temp_FacilityReportingCompleteness]";
-            //cmd.CommandType = CommandType.StoredProcedure;
+            string sql = "Select * from [dbo].[temp_FacilityReportingCompleteness]";
 
+            var report = handler.ExecuteSQLScriptAsync<FacilityCompletenessModel>(sql);
+            return report;
+            /*
             var table = new Utils().RetrieveAsDataTable(cmd);
             cmd.Dispose();
 
@@ -131,14 +139,16 @@ namespace ART.DAL.Repository
                 });
             }
             return model;
+            */
         }
 
-        public List<FacilityCompletenessModel> GetCompletenessReportPatient(string IPShortName)
+        public IList<FacilityCompletenessModel> GetCompletenessReportPatient(string IPShortName)
         {
-            var cmd = new SqlCommand("Select * from [dbo].[temp_PatientReportingCompleteness]");
-            //cmd.CommandText = "[dbo].[sp_get_PatientReportingCompleteness]";
-            //cmd.CommandType = CommandType.StoredProcedure;
+            string sql = "Select * from [dbo].[temp_PatientReportingCompleteness]";
 
+            var report = handler.ExecuteSQLScriptAsync<FacilityCompletenessModel>(sql);
+            return report;
+            /*
             var table = new Utils().RetrieveAsDataTable(cmd);
             cmd.Dispose();
 
@@ -154,24 +164,20 @@ namespace ART.DAL.Repository
                 });
             }
             return model;
+            */
         }
 
-        public List<Twelve_Month_Cohort_Retention_by_month_Model> Get_12_Month_Cohort_Retention_by_month(string IPShortName)
+        public IList<Twelve_Month_Cohort_Retention_by_month_Model> Get_12_Month_Cohort_Retention_by_month(string IPShortName)
         {
-            var cmd = new SqlCommand();
-            string sql = "select * from [dbo].[temp_12_Month_Cohort_Retention_by_month]";
+             string sql = "select * from [dbo].[temp_12_Month_Cohort_Retention_by_month]";
             if (!string.IsNullOrEmpty(IPShortName))
             {
-                sql += " where IP= @ip";
-                cmd.CommandText = sql;
-                var param = new SqlParameter("ip", SqlDbType.VarChar);
-                param.Value = IPShortName;
-                cmd.Parameters.Add(param);
+                sql += string.Format(" where IP= '{0}'", IPShortName);
             }
-            else
-            {
-                cmd.CommandText = sql;
-            }
+
+            var report = handler.ExecuteSQLScriptAsync<Twelve_Month_Cohort_Retention_by_month_Model>(sql);
+            return report;
+            /*
             var table = new Utils().RetrieveAsDataTable(cmd);
             cmd.Dispose();
 
@@ -196,25 +202,21 @@ namespace ART.DAL.Repository
                 });
             }
             return model;
+            */
         }
 
-        public List<PVLS_Eligibility_by_Months_Model> Get_PVLS_Eligibility_by_Months(string IPShortName, bool Returning)
+        public IList<PVLS_Eligibility_by_Months_Model> Get_PVLS_Eligibility_by_Months(string IPShortName, bool Returning)
         {
-            string tablename = Returning ? "[dbo].[temp_PVLS_Returning_Eligible_by_Months]" : "[dbo].[temp_PVLS_Newly_Eligible_by_Months]";
-            var cmd = new SqlCommand();
+            string tablename = Returning ? "temp_PVLS_Returning_Eligible_by_Months" : "temp_PVLS_Newly_Eligible_by_Months";
             string sql = "select * from " + tablename;
             if (!string.IsNullOrEmpty(IPShortName))
             {
-                sql += " where IP= @ip";
-                cmd.CommandText = sql;
-                var param = new SqlParameter("ip", SqlDbType.VarChar);
-                param.Value = IPShortName;
-                cmd.Parameters.Add(param);
+                sql += string.Format(" where IP= '{0}'", IPShortName);
             }
-            else
-            {
-                cmd.CommandText = sql;
-            }
+
+            var report = handler.ExecuteSQLScriptAsync<PVLS_Eligibility_by_Months_Model>(sql);
+            return report;
+            /*
             var table = new Utils().RetrieveAsDataTable(cmd);
             cmd.Dispose();
 
@@ -239,25 +241,21 @@ namespace ART.DAL.Repository
                 });
             }
             return model;
+            */
         }
 
-        public List<Twelve_Month_Cohort_Retention_Trend_Model> Get_12_Month_Cohort_Retention_Trend(string IPShortName)
+        public IList<Twelve_Month_Cohort_Retention_Trend_Model> Get_12_Month_Cohort_Retention_Trend(string IPShortName)
         {
-            var cmd = new SqlCommand();
             string sql = "select * from [dbo].[temp_12_Month_Cohort_Retention_Trend]";
             if (!string.IsNullOrEmpty(IPShortName))
             {
-                sql += " where IP= @ip";
-                cmd.CommandText = sql;
-                var param = new SqlParameter("ip", SqlDbType.VarChar);
-                param.Value = IPShortName;
-                cmd.Parameters.Add(param);
-            }
-            else
-            {
-                cmd.CommandText = sql;
+                sql += string.Format(" where IP= '{0}'", IPShortName);
             }
 
+            var report = handler.ExecuteSQLScriptAsync<Twelve_Month_Cohort_Retention_Trend_Model>(sql);
+            return report;
+
+            /*
             var table = new Utils().RetrieveAsDataTable(cmd);
             cmd.Dispose();
 
@@ -305,28 +303,34 @@ namespace ART.DAL.Repository
                 });
             }
             return model;
+            */
         }
 
         public Dictionary<string, List<PatientLineListing>> GetPatientLineListing(string IPShortName)
         {
             Dictionary<string, List<PatientLineListing>> patientlineDictionary = new Dictionary<string, List<PatientLineListing>>();
-            var cmd = new SqlCommand();
-
+ 
             string sql = "select * from [dbo].[temp_patientlinelisting]";
             if (!string.IsNullOrEmpty(IPShortName))
             {
-                sql += " where IP= @ip";
-                cmd.CommandText = sql;
-                var param = new SqlParameter("ip", SqlDbType.VarChar);
-                param.Value = IPShortName;
-                cmd.Parameters.Add(param);
-            }
-            else
+                sql += string.Format(" where IP= '{0}'", IPShortName);
+            } 
+
+            var report = handler.ExecuteSQLScriptAsync<PatientLineListing>(sql);
+            report.AsParallel().ForAll(x =>
             {
-                cmd.CommandText = sql;
-            }
+                if (patientlineDictionary.Keys.Contains(x.DatimCode))
+                {
+                    patientlineDictionary[x.DatimCode].Add(x);
+                }
+                else
+                {
+                    patientlineDictionary.Add(x.DatimCode, new List<PatientLineListing> { x });
+                }
+            });
+            return patientlineDictionary;
 
-
+            /*
             var data = new Utils().RetrieveAsDataTable(cmd);
             if (data.Rows == null || data.Rows.Count == 0)
                 return null;
@@ -414,21 +418,19 @@ namespace ART.DAL.Repository
             }
 
             return patientlineDictionary; // patientlinedata;
+            */
         }
 
 
-        /// <summary>
-        /// this is for external consumption like shield
-        /// tx_new is for the current month
-        /// </summary>
-        /// <returns></returns>
+
         public string Tx_Curr_Tx_New()
         {
-            var cmd = new SqlCommand("sp_tx_curr_tx_new");
-            cmd.CommandType = CommandType.StoredProcedure;
-            var data = new Utils().RetrieveAsDataTable(cmd);
+            var report = handler.ExecuteStoredProcedure<NDR_DATIM_DHIS2_Model>("sp_tx_curr_tx_new", null);
+            return Newtonsoft.Json.JsonConvert.SerializeObject(report);
 
-            JavaScriptSerializer serializer = new JavaScriptSerializer();
+            /*
+            var data = new Utils().RetrieveAsDataTable(cmd);
+            
             List<Dictionary<string, object>> rows = new List<Dictionary<string, object>>();
             Dictionary<string, object> row;
             foreach (DataRow dr in data.Rows)
@@ -441,66 +443,23 @@ namespace ART.DAL.Repository
                 rows.Add(row);
             }
             return serializer.Serialize(rows);
-            //List<NDR_DATIM_DHIS2_Model> ndr_data = new List<NDR_DATIM_DHIS2_Model>();
-            //foreach (DataRow row in data.Rows)
-            //{
-            //    ndr_data.Add(new NDR_DATIM_DHIS2_Model
-            //    {
-            //        IP = row.Field<string>("IP"),
-            //        FacilityName = row.Field<string>("Facility"),
-            //        FacilityCode = row.Field<string>("FacilityCode"),
-            //        NDR_TX_CURR = row.Field<int>("NDR_TX_CURR"),
-            //        NDR_TX_NEW = row.Field<int>("NDR_TX_NEW"),
-            //    });
-            //}
-            //return ndr_data;
-        }
-
-
-        public async Task<List<PivotTable>> GetPivotTable(string reportPeriod, List<string> IPs = null)
-        {
-            var counts = new BaseDAO<PivotTable, int>().RetrieveAllLazily()
-                .Count(x => x.ReportingPeriod == reportPeriod);
-
-            List<PivotTable> pivotTables = new List<PivotTable>();
-            if (counts == 0)
+            List<NDR_DATIM_DHIS2_Model> ndr_data = new List<NDR_DATIM_DHIS2_Model>();
+            foreach (DataRow row in data.Rows)
             {
-                string url = System.Configuration.ConfigurationManager.AppSettings["pivotTableUrl"];
-                string queryString = $"?Quater={reportPeriod}&&IPstring={Newtonsoft.Json.JsonConvert.SerializeObject(IPs)}";
-
-                url += queryString;
-
-                Logger.LogInfo("", "about to call " + url);
-
-                pivotTables = await new Utils().GetDateListRemotely<PivotTable>(url);
-                InsertPivotData(pivotTables, reportPeriod);
-            }
-            else
-            {
-                pivotTables = new BaseDAO<PivotTable, int>().RetrieveAllLazily().Where(x => x.ReportingPeriod == reportPeriod).ToList();
-            }
-            return pivotTables;
-        }
-
-        void InsertPivotData(List<PivotTable> data, string reportPeriod)
-        {
-            BaseDAO<PivotTable, int> baseDAO = new BaseDAO<PivotTable, int>();
-
-            string sql = "Truncate table RecentPivotTable";
-            baseDAO.RunSQL(sql);
-
-            using (var session = NhibernateSessionManager.Instance.GetSession().SessionFactory.OpenStatelessSession())
-            using (var tx = session.BeginTransaction())
-            {
-                foreach (var d in data)
+                ndr_data.Add(new NDR_DATIM_DHIS2_Model
                 {
-                    d.ReportingPeriod = reportPeriod;
-                    session.Insert(d);
-                }
-                tx.Commit();
+                    IP = row.Field<string>("IP"),
+                    FacilityName = row.Field<string>("Facility"),
+                    FacilityCode = row.Field<string>("FacilityCode"),
+                    NDR_TX_CURR = row.Field<int>("NDR_TX_CURR"),
+                    NDR_TX_NEW = row.Field<int>("NDR_TX_NEW"),
+                });
             }
+            return ndr_data;
+            */
         }
-    }
 
-    */
+
+        
+    }
 }

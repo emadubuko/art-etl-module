@@ -4,6 +4,7 @@ using Common.CommonRepo;
 using Common.DBFasade;
 using Common.Utility;
 using Newtonsoft.Json;
+using QueueSubscriber;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -14,30 +15,14 @@ namespace TestConsole2
 {
     class Program
     {
-        static ThirdPartyProcessor _3PartyProcessor = new ThirdPartyProcessor();
         static void Main(string[] args)
         {
             Console.WriteLine("Hello World!");
-
-            //var error = new
-            //{
-            //    FileName = "0_UPDATED_20180518105137_235.xml",
-            //    ErrorMessage = "new error",
-            //    CrticalError = true
-            //};
-            //var summary = new
-            //{
-            //    FacilityName = "Others",
-            //    ErrorDetails = new List<dynamic> { error },
-            //    InvalidFiles = 1,
-            //    FileUploadBacthNumber = "some other batch",
-            //};
-            //_3PartyProcessor.PublishValidationSummaryAsync(
-            //    JsonConvert.SerializeObject(new List<dynamic> { summary }));
-
-            string xmlContent = File.ReadAllText(@"C:\logs\ndrerror\unzipped\0_UPDATED_20180518105137_235.xml");
+            string mediatorUrl = Utils.GetAppConfigItem("mediatorHostIP");
+            //string xmlContent = File.ReadAllText(@"C:\logs\ndrerror\unzipped\0_UPDATED_20180518105137_235.xml");
             var documentProcessor = new DocumentProcessor();
-            documentProcessor.ProcessDocument(xmlContent);
+            new MessageListener(mediatorUrl, documentProcessor.ProcessDocument);//("10.10.8.178", documentProcessor.ProcessDocument);
+            //documentProcessor.ProcessDocument(xmlContent);
             // MigrateData();
 
             Console.WriteLine("done");

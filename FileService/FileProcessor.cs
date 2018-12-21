@@ -26,11 +26,11 @@ namespace FileService
 
         public async Task<string> UnZipFilesAsync(string destinationFile)
         {
-            IList<NDRFile> theFiles = FileRepo.RetrieveAllLazily().Where(x=>x.Status == FileProcessingStatus.Pending).ToList();
+            IList<NDRFile> theFiles = FileRepo.RetrieveAllLazily().Where(x => x.Status == FileProcessingStatus.Pending).ToList();
 
             if (theFiles == null || theFiles.Count == 0)
             {
-              
+
                 FileZipUpload batch = batchRepo.RetrieveByStatus(FileBatchStatus.Pending);
                 if (batch != null)
                 {
@@ -47,7 +47,7 @@ namespace FileService
                         batch.Status = FileBatchStatus.Processing;
                         batchRepo.Update(batch);
                         batchRepo.CommitChanges();
-                         
+
                     }
                     catch (Exception ex)
                     {
@@ -62,6 +62,8 @@ namespace FileService
             //either push the files to the server 
 
             string batchNo = await SendFilesToMediatorAsync(theFiles);
+
+            FileRepo.CloseSession();
             return batchNo;
         }
 
@@ -74,18 +76,21 @@ namespace FileService
             string fileBatchNo = "";
 
             HttpClient client = new HttpClient(httpClientHandler);
-            var byteArray = Encoding.ASCII.GetBytes("ndr:xds");
+            string username_password = Utils.GetAppConfigItem("mediator_username_password");
+            var byteArray = Encoding.ASCII.GetBytes(username_password); //Encoding.ASCII.GetBytes("ndr:xds");
+
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
             HttpResponseMessage response;
             HttpContent content;
-            string url = string.Format("https://10.10.8.178:5000/encounters/");
+
+            string url = Utils.GetAppConfigItem("mediatorUrl"); //string.Format("https://10.10.8.178:5000/encounters/");
 
             foreach (var item in theFiles)
             {
                 fileBatchNo = item.BatchNumber;
 
                 string fileContent = await File.ReadAllTextAsync(item.FileName);
-                var postcontent = new StringContent(fileContent, Encoding.UTF8, "application/json");
+                var postcontent = new StringContent(item.Id + "@||@" + item.BatchNumber + "@||@" + fileContent, Encoding.UTF8, "application/json");
 
                 response = await client.PostAsync(url, postcontent);
                 content = response.Content;
@@ -138,15 +143,20 @@ namespace FileService
                     {
                         ZipEntry zipEntry = zipFile[i];
                         string fileName = ZipEntry.CleanName(zipEntry.Name);
+
                         if (!zipEntry.IsFile)
                         {
                             continue;
                         }
-
                         Stream zipStream = zipFile.GetInputStream(zipEntry);
+                        
                         if (fileName.EndsWith(".zip"))
                         {
-                            allFiles.AddRange(UnZip(zipStream, destination, batch));
+                            if (!zipStream.CanSeek)
+                            {
+                                continue;
+                            }
+                            allFiles.AddRange(UnZip(zipStream, destination, batch));                           
                         }
                         else
                         {
@@ -161,7 +171,7 @@ namespace FileService
                                 byte[] buffer = new byte[8 * 1024];
                                 StreamUtils.Copy(zipStream, streamWriter, buffer);
                             }
-
+                             
 
                             allFiles.Add(
                                  new NDRFile
@@ -188,7 +198,7 @@ namespace FileService
         }
 
 
-        
+
 
     }
 }

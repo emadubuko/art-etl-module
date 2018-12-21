@@ -57,29 +57,41 @@ namespace Common.DBFasade
 
         public void CloseSession()
         {
-            ISession contextSession = GetSession();
-            if ((contextSession != null) && contextSession.IsOpen)
+            if (CurrentSessionContext.HasBind(sessionFactory))
             {
-                try
+                var session = sessionFactory.GetCurrentSession();
+                var transaction = session.Transaction;
+                if (transaction != null && transaction.IsActive)
                 {
-                    contextSession.Flush();
-                    if (contextSession.Transaction != null && contextSession.Transaction.IsActive)
-                    {
-                        contextSession.Transaction.Commit();
-                    }
+                    transaction.Commit();
                 }
-                catch
-                {
-                    if (contextSession.Transaction != null && contextSession.Transaction.IsActive)
-                    {
-                        contextSession.Transaction.Rollback();
-                    }
-                }
-                finally
-                {
-                    contextSession.Close();
-                }
+                session = CurrentSessionContext.Unbind(sessionFactory);
+                session.Close();
             }
+
+            //ISession contextSession = GetSession();
+            //if ((contextSession != null) && contextSession.IsOpen)
+            //{
+            //    try
+            //    {
+            //        contextSession.Flush();
+            //        if (contextSession.Transaction != null && contextSession.Transaction.IsActive)
+            //        {
+            //            contextSession.Transaction.Commit();
+            //        }
+            //    }
+            //    catch
+            //    {
+            //        if (contextSession.Transaction != null && contextSession.Transaction.IsActive)
+            //        {
+            //            contextSession.Transaction.Rollback();
+            //        }
+            //    }
+            //    finally
+            //    {
+            //        contextSession.Close();
+            //    }
+            //}
         }
 
 

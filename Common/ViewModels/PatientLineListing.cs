@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ART.DAL.ViewModels
+namespace Common.ViewModels
 {
     public class PatientLineListing
     {

@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace ART.DAL.ViewModels
+namespace Common.ViewModels
 {
     public class DashBoardFilter
     {
@@ -12,13 +12,13 @@ namespace ART.DAL.ViewModels
         public List<string> Months { get; set; }
     }
 
-    public class IPLGAFacility
-    {
-        public string IP { get; set; }
-        public string FacilityName { get; set; }
-        public string DatimFacilityCode { get; set; }
-        public LGA LGA { get; set; }
-    }
+    //public class IPLGAFacility
+    //{
+    //    public string IP { get; set; }
+    //    public string FacilityName { get; set; }
+    //    public string DatimFacilityCode { get; set; }
+    //    public LGA LGA { get; set; }
+    //}
 
     public class DataSearchModel
     {

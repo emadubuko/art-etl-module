@@ -22,27 +22,32 @@ namespace TestConsole
         static void Main(string[] args)
         {
 
-            DocumentValidator("");
+            //DocumentValidator("");
 
             Console.WriteLine("Hello World!");
             string destinationFolder = @"C:\logs\ndrerror\unzipped\";
-            var documentProcessor = new DocumentProcessor();
+            //var documentProcessor = new DocumentProcessor();
+            var fileProcessor = new FileProcessor();
             var filerepo = new NDRFileRepo();
 
-            Thread ths = new Thread( async () =>
-            { 
-               var batchNo =  await new FileProcessor().UnZipFilesAsync(destinationFolder);
-                await filerepo.MarkBatchAsCompletedAsync(batchNo);
-                //await FileServiceTestAsync();
-            });
-             
-            var new_thread = new Thread(() =>
-            {               
-                new MessageListener("10.10.8.178", documentProcessor.ProcessDocument);
-            });
+            var batchNo = fileProcessor.UnZipFilesAsync(destinationFolder).Result;
+            //filerepo.MarkBatchAsCompletedAsync(batchNo).Wait();
 
-            ths.Start();
-            new_thread.Start();
+
+            //Thread ths = new Thread( async () =>
+            //{ 
+            //   var batchNo =  await new FileProcessor().UnZipFilesAsync(destinationFolder);
+            //    await filerepo.MarkBatchAsCompletedAsync(batchNo);
+            //    //await FileServiceTestAsync();
+            //});
+             
+            //var new_thread = new Thread(() =>
+            //{               
+            //    new MessageListener("10.10.8.178", documentProcessor.ProcessDocument);
+            //});
+
+            //ths.Start();
+            //new_thread.Start();
 
             Console.WriteLine("Waiting...");
             Console.ReadLine();
